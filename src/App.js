@@ -2,6 +2,7 @@ import './App.css';
 import { router } from './pages/Routes/Routes';
 import {RouterProvider} from 'react-router-dom';
 import bgimage from './assets/images/bg.png'
+import toast, { Toaster } from 'react-hot-toast';
 
 
 function App() {
@@ -11,6 +12,7 @@ function App() {
       <RouterProvider router={router}>
         
       </RouterProvider>
+      <Toaster />
     </div>
   );
 }
