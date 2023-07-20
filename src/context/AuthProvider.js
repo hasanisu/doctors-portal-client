@@ -12,6 +12,11 @@ const provider = new GoogleAuthProvider();
 const AuthProvider = ({children}) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true)
+    const [theme, setTheme] = useState("light")
+
+    const toggleTheme=()=>{
+        setTheme((curr)=> (curr === "light" ? "dark" : "light"))
+      }
 
     const createUser =(email, password)=>{
         setLoading(true)
@@ -54,6 +59,9 @@ const AuthProvider = ({children}) => {
         signInWithGoogle,
         user,
         loading,
+        theme,
+        setTheme,
+        toggleTheme
     }
 
 

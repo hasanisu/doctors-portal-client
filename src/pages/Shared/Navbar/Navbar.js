@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { AuthContext } from '../../../context/AuthProvider';
 
 const Navbar = () => {
-    const { user, logOut } = useContext(AuthContext);
+    const { user, logOut, toggleTheme } = useContext(AuthContext);
     const handleLogout = () => {
         logOut()
             .then(() => { })
@@ -25,10 +25,11 @@ const Navbar = () => {
             :
             <li><Link to="/login">Login</Link></li>
         }
+        <input onClick={toggleTheme} type="checkbox" className="toggle toggle-accent toggle-sm mt-2" />
     </React.Fragment>
 
     return (
-        <div className="navbar bg-base-100 flex justify-between">
+        <div className="navbar  flex justify-between">
             <div className="navbar-start">
                 <div className="dropdown">
                     <label tabIndex={0} className="btn btn-ghost lg:hidden">
