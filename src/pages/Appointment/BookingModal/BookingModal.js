@@ -1,8 +1,12 @@
 import { format } from "date-fns";
-import React from "react";
+import React, { useContext } from "react";
+import { AuthContext } from "../../../context/AuthProvider";
+import { toast } from "react-hot-toast";
 
-const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
-  const { name, slots } = treatment; // treatment is appointment option just different name
+const BookingModal = ({ treatment, setTreatment, selectedDate,refetch }) => {
+  const { name, price, slots } = treatment; // treatment is appointment option just different name
+  const { user } = useContext(AuthContext);
+  console.log(user);
 
   const handleBooking = (event) => {
     event.preventDefault();
@@ -20,12 +24,30 @@ const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
       slot,
       email,
       phone,
+      price,
     };
     //TODO: send data to the server
     // and once data is saved then close the modal
     // and display success toast
-    console.log(booking);
-    setTreatment(null);
+    fetch("https://doctors-portal-server-two-wine.vercel.app/bookings", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(booking),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        if (data.acknowledged) {
+          setTreatment(null);
+          toast.success("booking confirmed");
+          refetch();
+        }
+        else{
+          toast.error(data.message)
+        }
+      });
   };
   return (
     <>
@@ -51,28 +73,33 @@ const BookingModal = ({ treatment, setTreatment, selectedDate }) => {
               value={format(selectedDate, "PP")}
               className="input input-bordered w-full"
             />
-            <select name="slot" className="select select-bordered w-full">
-              <option>Who shot first?</option>
+            <select name="slot" className="select select-bordered w-full" >
+              <option>Select Your Time Slot</option>
 
               {slots.map((slot, i) => (
-                <option value={slot} key={i}>
+                <option value={slot} key={i} required>
                   {slot}
                 </option>
               ))}
             </select>
             <input
+              defaultValue={user?.uid && user.displayName}
+              disabled
               name="name"
               type="text"
               placeholder="Your Name"
               className="input input-bordered w-full"
             />
             <input
+              defaultValue={user?.uid && user.email}
+              disabled
               name="email"
               type="email"
               placeholder="Email Address"
               className="input input-bordered w-full"
             />
             <input
+            required
               name="phone"
               type="text"
               placeholder="Phone Number"

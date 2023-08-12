@@ -3,13 +3,22 @@ import { useState } from 'react';
 import { useContext } from 'react';
 import { useForm } from "react-hook-form";
 import toast from 'react-hot-toast';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { AuthContext } from '../../context/AuthProvider';
+import useToken from '../../hooks/useToken';
 
 const SignUp = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
     const {createUser, updateUserProfile} = useContext(AuthContext);
-    const [signupError, setSignupError] = useState('')
+    const [signupError, setSignupError] = useState('');
+
+    const [createdUserEmail, setCreatedUserEmail] = useState();
+    //custom hooks
+    const [token] = useToken(createdUserEmail);
+    const navigate = useNavigate();
+    if(token){
+        navigate('/')
+    }
 
     const handleSignup=data=>{
         console.log(data);
@@ -17,13 +26,17 @@ const SignUp = () => {
         createUser(data.email, data.password)
         .then(result => {
             const user = result.user;
-            console.log(user)
             toast('User Created succesfully')
+            
             const userInfo ={
                 displayName: data.name
             }
+            console.log(userInfo);
             updateUserProfile(userInfo)
-            .then(()=>{})
+            .then(()=>{
+                saveUser(data.name, data.email)
+                
+            })
             .catch(err => console.error(err))
         })
         .catch(err => {
@@ -31,6 +44,24 @@ const SignUp = () => {
             setSignupError(err.message)
         })
     }
+
+    const saveUser =(name, email)=>{
+        const user = {name, email}
+        fetch('https://doctors-portal-server-two-wine.vercel.app/users',{
+            method:'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        })
+        .then(res => res.json())
+        .then(data => 
+            setCreatedUserEmail(email)
+            )
+        
+    }
+
+    
     
     return (
         <div className='h-[800px] flex justify-center items-center '>
